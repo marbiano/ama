@@ -5,19 +5,35 @@ pragma solidity ^0.8.0;
 import "hardhat/console.sol";
 
 contract AMA {
-    uint256 questionsCount;
+  uint256 questionsCount;
 
-    constructor() {
-        console.log("I'm alive!");
-    }
+  event NewQuestion(address indexed from, uint256 timestamp, string question);
 
-    function ask() public {
-        questionsCount += 1;
-        console.log("%s has asked a question", msg.sender);
-    }
+  struct Question {
+    address creator;
+    string question;
+    uint256 timestamp;
+  }
 
-    function getTotalQuestions() public view returns (uint256) {
-        console.log("Total questions: %s", questionsCount);
-        return questionsCount;
-    }
+  Question[] questions;
+
+  constructor() {
+    console.log("I'm alive!");
+  }
+
+  function ask(string memory _question) public {
+    questionsCount += 1;
+    console.log("%s has asked a question", msg.sender);
+
+    questions.push(Question(msg.sender, _question, block.timestamp));
+    emit NewQuestion(msg.sender, block.timestamp, _question);
+  }
+
+  function getTotalQuestions() public view returns (uint256) {
+    return questionsCount;
+  }
+
+  function getAllQuestions() public view returns (Question[] memory) {
+    return questions;
+  }
 }
