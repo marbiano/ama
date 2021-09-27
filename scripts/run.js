@@ -5,11 +5,16 @@ const hre = require('hardhat');
 async function main() {
   const [owner, ...accounts] = await hre.ethers.getSigners();
   const AMAFactory = await hre.ethers.getContractFactory('AMA');
-  const AMA = await AMAFactory.deploy();
+  const AMA = await AMAFactory.deploy({
+    value: hre.ethers.utils.parseEther('0.1'),
+  });
   await AMA.deployed();
 
   console.log('Contract deployed to:', AMA.address);
   console.log('Constract deployed by:', owner.address);
+
+  const balance = await hre.ethers.provider.getBalance(AMA.address);
+  console.log('Contract balance:', hre.ethers.utils.formatEther(balance));
 
   const txn = await AMA.ask('How are you doing?');
   await txn.wait();

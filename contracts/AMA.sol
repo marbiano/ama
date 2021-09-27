@@ -17,7 +17,7 @@ contract AMA {
 
   Question[] questions;
 
-  constructor() {
+  constructor() payable {
     console.log("I'm alive!");
   }
 

@@ -1,19 +1,21 @@
 // Require the Hardhat Runtime Environment explicitly. Optional
 // but useful for running the script through `node <script>`.
-const hre = require("hardhat");
+const hre = require('hardhat');
 
 async function main() {
   const [owner] = await hre.ethers.getSigners();
   const balance = await owner.getBalance();
 
-  console.log("Deploying contracts with account: ", owner.address);
-  console.log("Account balance: ", balance.toString());
+  console.log('Deploying contracts with account: ', owner.address);
+  console.log('Account balance: ', balance.toString());
 
-  const AMAFactory = await hre.ethers.getContractFactory("AMA");
-  const AMA = await AMAFactory.deploy();
+  const AMAFactory = await hre.ethers.getContractFactory('AMA');
+  const AMA = await AMAFactory.deploy({
+    value: hre.ethers.utils.parseEther('0.001'),
+  });
   await AMA.deployed();
 
-  console.log("Contract deployed to:", AMA.address);
+  console.log('Contract deployed to:', AMA.address);
 }
 
 main()
