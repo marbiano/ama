@@ -6,6 +6,7 @@ import "hardhat/console.sol";
 
 contract AMA {
   uint256 questionsCount;
+  uint256 private salt;
 
   event NewQuestion(address indexed from, uint256 timestamp, string question);
 
@@ -24,6 +25,9 @@ contract AMA {
   function ask(string memory _question) public {
     questionsCount += 1;
     console.log("%s has asked a question", msg.sender);
+
+    uint256 random = (block.difficulty + block.timestamp + salt) % 100;
+    salt = random;
 
     questions.push(Question(msg.sender, _question, block.timestamp));
     emit NewQuestion(msg.sender, block.timestamp, _question);
