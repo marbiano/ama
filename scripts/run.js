@@ -19,13 +19,21 @@ async function main() {
   const txn = await AMA.ask('How are you doing?');
   await txn.wait();
 
-  const anotherTxn = await AMA.connect(accounts[0]).ask('What is your name?');
-  await anotherTxn.wait();
+  const secondTxn = await AMA.connect(accounts[0]).ask('What is your name?');
+  await secondTxn.wait();
 
-  const count = await AMA.getTotalQuestions();
-  const questions = await AMA.getAllQuestions();
-  console.log('Total questions: %s', count);
-  console.log(questions);
+  const [question] = await AMA.getQuestions();
+  console.log(question);
+
+  const thirdTxn = await AMA.answer(
+    question.creator,
+    question.timestamp,
+    'Doing ok',
+  );
+  await thirdTxn.wait();
+
+  const answer = await AMA.getAnswer(question.creator, question.timestamp);
+  console.log(answer);
 }
 
 main()

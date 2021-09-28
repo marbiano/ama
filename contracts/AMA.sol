@@ -5,10 +5,6 @@ pragma solidity ^0.8.0;
 import "hardhat/console.sol";
 
 contract AMA {
-  uint256 questionsCount;
-  uint256 private salt;
-
-  event NewQuestion(address indexed from, uint256 timestamp, string question);
 
   struct Question {
     address creator;
@@ -16,9 +12,17 @@ contract AMA {
     uint256 timestamp;
   }
 
+  struct Answer {
+    string question;
+    uint256 timestamp;
+  }
+
   Question[] questions;
 
   mapping(address => uint256) public lastQuestionTimestamp;
+  mapping(address => mapping(uint256 => Answer)) public answers;
+
+  event NewQuestion(address indexed from, uint256 timestamp, string question);
 
   constructor() payable {
     console.log("I'm alive!");
@@ -32,21 +36,22 @@ contract AMA {
 
     lastQuestionTimestamp[msg.sender] = block.timestamp;
 
-    uint256 random = (block.difficulty + block.timestamp + salt) % 100;
-    salt = random;
-
-    questionsCount += 1;
     console.log("%s has asked a question", msg.sender);
 
     questions.push(Question(msg.sender, _question, block.timestamp));
     emit NewQuestion(msg.sender, block.timestamp, _question);
   }
 
-  function getTotalQuestions() public view returns (uint256) {
-    return questionsCount;
+  function answer(address _questionCreator, uint _questionTime, string memory _answer) public {
+    answers[_questionCreator][_questionTime] = Answer(_answer, block.timestamp);
+    console.log("%s question has been answered", _questionCreator);
   }
 
-  function getAllQuestions() public view returns (Question[] memory) {
+  function getQuestions() public view returns (Question[] memory) {
     return questions;
+  }
+
+  function getAnswer(address _questionCreator, uint _questionTime) public view returns (Answer memory) {
+    return answers[_questionCreator][_questionTime];
   }
 }
