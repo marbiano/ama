@@ -2,6 +2,12 @@ import { ethers } from 'ethers';
 import * as React from 'react';
 
 import contractABI from '../artifacts/contracts/AMA.sol/AMA.json';
+import ConnectWallet from '../components/ConnectWallet';
+import Header from '../components/Header';
+import Layout from '../components/Layout';
+import Questions from '../components/Questions';
+import Skeleton from '../components/Skeleton';
+import SubmitQuestion from '../components/SubmitQuestion';
 
 const METAMASK_ACTIONS = {
   eth_accounts: 'eth_accounts',
@@ -9,38 +15,32 @@ const METAMASK_ACTIONS = {
 };
 
 export default function Index() {
-  const { questions, ask } = useQuestions();
+  const { questions, ask, answer, getAnswer } = useQuestions();
   const { account, connect } = useEthAccount();
-  const [question, setQuestion] = React.useState('');
 
   return (
-    <div>
-      Welcome to my AMA{' '}
-      {!account && (
-        <button type="button" onClick={connect}>
-          Connect Wallet
-        </button>
-      )}
-      {account && (
+    <Layout>
+      <Header />
+      {account ? (
         <>
-          <input
-            type="text"
-            value={question}
-            onChange={(e) => setQuestion(e.target.value)}
-          />
-          <button type="button" onClick={() => ask(question)}>
-            Ask a question
-          </button>
+          {account && <SubmitQuestion onSubmit={ask} />}
+          {questions.length > 0 && (
+            <Questions
+              items={questions}
+              onAnswer={answer}
+              getAnswer={getAnswer}
+            />
+          )}
+        </>
+      ) : (
+        <>
+          <ConnectWallet onConnect={connect}>
+            Connect to participate
+          </ConnectWallet>
+          <Skeleton />
         </>
       )}
-      {questions.length > 0 && (
-        <ul>
-          {questions.map((q) => (
-            <li key={q.createdAt}>{q.question}</li>
-          ))}
-        </ul>
-      )}
-    </div>
+    </Layout>
   );
 }
 
@@ -113,17 +113,17 @@ function useQuestions() {
       signer,
     );
 
-    const rawQuestions = await contract.getAllQuestions();
+    const results = await contract.getQuestions();
     setQuestions(
-      rawQuestions.map((q) => ({
-        creator: q.creator,
-        question: q.question,
-        createdAt: new Date(q.timestamp.toNumber() * 1000),
+      results.map((r) => ({
+        creator: r.creator,
+        timestamp: r.timestamp,
+        question: r.question,
       })),
     );
   }, [account]);
 
-  async function ask(question) {
+  async function ask(text) {
     const { ethereum } = window;
     const provider = new ethers.providers.Web3Provider(ethereum);
     const signer = provider.getSigner();
@@ -133,16 +133,49 @@ function useQuestions() {
       signer,
     );
 
-    const txn = await contract.ask(question, { gasLimit: 300000 });
+    const txn = await contract.ask(text, { gasLimit: 300000 });
     console.log('Mining...', txn.hash);
     await txn.wait();
     console.log('Mined -- ', txn.hash);
     getQuestions();
   }
 
+  async function answer(question, text) {
+    const { ethereum } = window;
+    const provider = new ethers.providers.Web3Provider(ethereum);
+    const signer = provider.getSigner();
+    const contract = new ethers.Contract(
+      process.env.NEXT_PUBLIC_CONTRACT_ADDRESS,
+      contractABI.abi,
+      signer,
+    );
+
+    const txn = await contract.answer(
+      question.creator,
+      question.timestamp,
+      text,
+    );
+    console.log('Mining...', txn.hash);
+    await txn.wait();
+    console.log('Mined -- ', txn.hash);
+  }
+
+  async function getAnswer(question) {
+    const { ethereum } = window;
+    const provider = new ethers.providers.Web3Provider(ethereum);
+    const signer = provider.getSigner();
+    const contract = new ethers.Contract(
+      process.env.NEXT_PUBLIC_CONTRACT_ADDRESS,
+      contractABI.abi,
+      signer,
+    );
+
+    return contract.getAnswer(question.creator, question.timestamp);
+  }
+
   React.useEffect(() => {
     getQuestions();
   }, [account, getQuestions]);
 
-  return { questions, ask };
+  return { questions, ask, answer, getAnswer };
 }
