@@ -29,7 +29,9 @@
     "yarn": "^1.22.11"
   },
   "scripts": {
+    "compile": "hardhat compile",
     "dev": "next dev",
+    "prebuild": "yarn compile",
     "build": "next build",
     "start": "next start",
     "lint": "next lint"
