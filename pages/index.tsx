@@ -2,6 +2,9 @@ import { ethers } from 'ethers';
 import * as React from 'react';
 
 import contractABI from '../artifacts/contracts/AMA.sol/AMA.json';
+import ConnectWallet from '../components/ConnectWallet';
+import Header from '../components/Header';
+import SubmitQuestion from '../components/SubmitQuestion';
 
 const METAMASK_ACTIONS = {
   eth_accounts: 'eth_accounts',
@@ -14,25 +17,12 @@ export default function Index() {
   const [question, setQuestion] = React.useState('');
 
   return (
-    <div>
-      Welcome to my AMA{' '}
+    <div style={{ maxWidth: 600, marginLeft: 300, marginTop: 100 }}>
+      <Header />
       {!account && (
-        <button type="button" onClick={connect}>
-          Connect Wallet
-        </button>
+        <ConnectWallet onConnect={connect}>Connect wallet to ask</ConnectWallet>
       )}
-      {account && (
-        <>
-          <input
-            type="text"
-            value={question}
-            onChange={(e) => setQuestion(e.target.value)}
-          />
-          <button type="button" onClick={() => ask(question)}>
-            Ask a question
-          </button>
-        </>
-      )}
+      {account && <SubmitQuestion onSubmit={ask} />}
       {questions.length > 0 && (
         <ul>
           {questions.map((q) => (
