@@ -133,9 +133,8 @@ function useQuestions() {
       signer,
     );
 
-    const txn = await contract.ask(question);
+    const txn = await contract.ask(question, { gasLimit: 300000 });
     console.log('Mining...', txn.hash);
-
     await txn.wait();
     console.log('Mined -- ', txn.hash);
     getQuestions();
