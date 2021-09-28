@@ -8,19 +8,7 @@ export default class Document extends NextDocument {
         <Head>
           <link
             rel="preload"
-            href="/fonts/inter-regular.woff2"
-            as="font"
-            crossOrigin="anonymous"
-          />
-          <link
-            rel="preload"
-            href="/fonts/inter-bold.woff2"
-            as="font"
-            crossOrigin="anonymous"
-          />
-          <link
-            rel="preload"
-            href="/fonts/inter-black.woff2"
+            href="/fonts/inter-variable.woff2"
             as="font"
             crossOrigin="anonymous"
           />

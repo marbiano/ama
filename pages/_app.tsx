@@ -5,9 +5,10 @@ const globalStyles = globalCss({
   '@font-face': [
     {
       fontFamily: 'Inter',
-      fontWeight: '400',
+      fontStyle: 'normal',
+      fontWeight: '100 900',
       fontDisplay: 'swap',
-      src: 'url(/fonts/inter-regular.woff2) format("woff2")',
+      src: 'url(/fonts/inter-variable.woff2) format("woff2")',
     },
     {
       fontFamily: 'Inter',

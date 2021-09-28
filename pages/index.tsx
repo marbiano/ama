@@ -114,7 +114,13 @@ function useQuestions() {
     );
 
     const results = await contract.getQuestions();
-    setQuestions(results);
+    setQuestions(
+      results.map((r) => ({
+        creator: r.creator,
+        timestamp: r.timestamp,
+        question: r.question,
+      })),
+    );
   }, [account]);
 
   async function ask(text) {

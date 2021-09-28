@@ -3,8 +3,9 @@ import { styled } from '../stitches.config';
 const Root = styled('div', {
   position: 'relative',
   width: '100vw',
-  height: '100vh',
-  overflow: 'hidden',
+  paddingBottom: '10rem',
+  // height: '100vh',
+  // overflow: 'hidden',
 
   '&:after': {
     content: '',
@@ -16,6 +17,7 @@ const Root = styled('div', {
     height: '15vh',
     background: 'linear-gradient(to bottom, $black00 0%, $black 80%)',
     zIndex: 3,
+    pointerEvents: 'none',
   },
 });
 

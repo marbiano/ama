@@ -5,7 +5,7 @@ const Field = styled('div', {
   position: 'relative',
   width: '100%',
   maxWidth: 600,
-  marginBottom: '5rem',
+  marginBottom: '6rem',
 });
 
 const Text = styled('textarea', {
@@ -16,6 +16,7 @@ const Text = styled('textarea', {
   border: '1px solid $white40',
   borderRadius: 3,
   color: '$white',
+  fontFamily: '$sans',
   fontSize: '1rem',
   lineHeight: 1.5,
   padding: '.5rem 7.5rem .5rem .75rem',
