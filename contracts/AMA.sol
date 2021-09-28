@@ -5,6 +5,7 @@ pragma solidity ^0.8.0;
 import "hardhat/console.sol";
 
 contract AMA {
+  address public owner;
 
   struct Question {
     address creator;
@@ -24,8 +25,14 @@ contract AMA {
 
   event NewQuestion(address indexed from, uint256 timestamp, string question);
 
+  modifier onlyOwner() {
+    require(msg.sender == owner, 'Not owner');
+    _;
+  }
+
   constructor() payable {
     console.log("I'm alive!");
+    owner = msg.sender;
   }
 
   function ask(string memory _question) public {
@@ -42,7 +49,7 @@ contract AMA {
     emit NewQuestion(msg.sender, block.timestamp, _question);
   }
 
-  function answer(address _questionCreator, uint _questionTime, string memory _answer) public {
+  function answer(address _questionCreator, uint _questionTime, string memory _answer) public onlyOwner {
     answers[_questionCreator][_questionTime] = Answer(_answer, block.timestamp);
     console.log("%s question has been answered", _questionCreator);
   }
