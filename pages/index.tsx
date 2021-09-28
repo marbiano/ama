@@ -4,6 +4,9 @@ import * as React from 'react';
 import contractABI from '../artifacts/contracts/AMA.sol/AMA.json';
 import ConnectWallet from '../components/ConnectWallet';
 import Header from '../components/Header';
+import Layout from '../components/Layout';
+import Questions from '../components/Questions';
+import Skeleton from '../components/Skeleton';
 import SubmitQuestion from '../components/SubmitQuestion';
 
 const METAMASK_ACTIONS = {
@@ -14,23 +17,24 @@ const METAMASK_ACTIONS = {
 export default function Index() {
   const { questions, ask } = useQuestions();
   const { account, connect } = useEthAccount();
-  const [question, setQuestion] = React.useState('');
 
   return (
-    <div style={{ maxWidth: 600, marginLeft: 300, marginTop: 100 }}>
+    <Layout>
       <Header />
-      {!account && (
-        <ConnectWallet onConnect={connect}>Connect wallet to ask</ConnectWallet>
+      {account ? (
+        <>
+          {account && <SubmitQuestion onSubmit={ask} />}
+          {questions.length > 0 && <Questions items={questions} />}
+        </>
+      ) : (
+        <>
+          <ConnectWallet onConnect={connect}>
+            Connect to participate
+          </ConnectWallet>
+          <Skeleton />
+        </>
       )}
-      {account && <SubmitQuestion onSubmit={ask} />}
-      {questions.length > 0 && (
-        <ul>
-          {questions.map((q) => (
-            <li key={q.createdAt}>{q.question}</li>
-          ))}
-        </ul>
-      )}
-    </div>
+    </Layout>
   );
 }
 

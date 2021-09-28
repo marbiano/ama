@@ -14,11 +14,11 @@ const Title = styled('h1', {
   fontSize: '2rem',
   fontWeight: '900',
   color: '$white',
-  margin: '2rem 0 .5rem',
+  margin: '2rem 0 1rem',
 });
 
 const Tagline = styled('h2', {
-  fontSize: '1rem',
+  fontSize: '1.1rem',
   fontWeight: '400',
   color: '$white70',
   margin: 0,
