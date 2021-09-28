@@ -14,7 +14,7 @@ contract AMA {
   }
 
   struct Answer {
-    string question;
+    string answer;
     uint256 timestamp;
   }
 
@@ -37,7 +37,7 @@ contract AMA {
 
   function ask(string memory _question) public {
     require(
-      lastQuestionTimestamp[msg.sender] + 1 days <= block.timestamp,
+      lastQuestionTimestamp[msg.sender] + 30 seconds <= block.timestamp,
       'You can ask only once per day'
     );
 
