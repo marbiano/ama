@@ -1,7 +1,6 @@
-import { ethers } from 'ethers';
+import { KeystoreAccount } from '@ethersproject/json-wallets/lib/keystore';
 import * as React from 'react';
 
-import contractABI from '../artifacts/contracts/AMA.sol/AMA.json';
 import ConnectWallet from '../components/ConnectWallet';
 import Header from '../components/Header';
 import Layout from '../components/Layout';
@@ -15,24 +14,18 @@ const METAMASK_ACTIONS = {
 };
 
 export default function Index() {
-  const { questions, ask, answer, getAnswer } = useQuestions();
   const { account, connect } = useEthAccount();
 
   return (
     <Layout>
       <Header />
-      {account ? (
+      {account && (
         <>
-          {account && <SubmitQuestion onSubmit={ask} />}
-          {questions.length > 0 && (
-            <Questions
-              items={questions}
-              onAnswer={answer}
-              getAnswer={getAnswer}
-            />
-          )}
+          {account && <SubmitQuestion />}
+          <Questions />
         </>
-      ) : (
+      )}
+      {account === false && (
         <>
           <ConnectWallet onConnect={connect}>
             Connect to participate
@@ -45,7 +38,7 @@ export default function Index() {
 }
 
 function useEthAccount() {
-  const [account, setAccount] = React.useState();
+  const [account, setAccount] = React.useState<KeystoreAccount | boolean>();
 
   React.useEffect(() => {
     const { ethereum } = window;
@@ -75,6 +68,7 @@ function useEthAccount() {
 
     if (!ethereum) {
       console.log('No access to the Ethereum object');
+      setAccount(false);
       return;
     }
 
@@ -88,94 +82,9 @@ function useEthAccount() {
       }
     } catch (e) {
       console.log(e);
+      setAccount(false);
     }
   }
 
   return { account, connect };
-}
-
-function useQuestions() {
-  const { account } = useEthAccount();
-  const [questions, setQuestions] = React.useState([]);
-
-  const getQuestions = React.useCallback(async () => {
-    if (!account) {
-      console.log('No wallet connected');
-      return;
-    }
-
-    const { ethereum } = window;
-    const provider = new ethers.providers.Web3Provider(ethereum);
-    const signer = provider.getSigner();
-    const contract = new ethers.Contract(
-      process.env.NEXT_PUBLIC_CONTRACT_ADDRESS,
-      contractABI.abi,
-      signer,
-    );
-
-    const results = await contract.getQuestions();
-    setQuestions(
-      results.map((r) => ({
-        creator: r.creator,
-        timestamp: r.timestamp,
-        question: r.question,
-      })),
-    );
-  }, [account]);
-
-  async function ask(text) {
-    const { ethereum } = window;
-    const provider = new ethers.providers.Web3Provider(ethereum);
-    const signer = provider.getSigner();
-    const contract = new ethers.Contract(
-      process.env.NEXT_PUBLIC_CONTRACT_ADDRESS,
-      contractABI.abi,
-      signer,
-    );
-
-    const txn = await contract.ask(text, { gasLimit: 300000 });
-    console.log('Mining...', txn.hash);
-    await txn.wait();
-    console.log('Mined -- ', txn.hash);
-    getQuestions();
-  }
-
-  async function answer(question, text) {
-    const { ethereum } = window;
-    const provider = new ethers.providers.Web3Provider(ethereum);
-    const signer = provider.getSigner();
-    const contract = new ethers.Contract(
-      process.env.NEXT_PUBLIC_CONTRACT_ADDRESS,
-      contractABI.abi,
-      signer,
-    );
-
-    const txn = await contract.answer(
-      question.creator,
-      question.timestamp,
-      text,
-    );
-    console.log('Mining...', txn.hash);
-    await txn.wait();
-    console.log('Mined -- ', txn.hash);
-  }
-
-  async function getAnswer(question) {
-    const { ethereum } = window;
-    const provider = new ethers.providers.Web3Provider(ethereum);
-    const signer = provider.getSigner();
-    const contract = new ethers.Contract(
-      process.env.NEXT_PUBLIC_CONTRACT_ADDRESS,
-      contractABI.abi,
-      signer,
-    );
-
-    return contract.getAnswer(question.creator, question.timestamp);
-  }
-
-  React.useEffect(() => {
-    getQuestions();
-  }, [account, getQuestions]);
-
-  return { questions, ask, answer, getAnswer };
 }

@@ -3,6 +3,12 @@ import * as timeago from 'timeago.js';
 
 import { styled } from '../stitches.config';
 import ArrowSvg from '../assets/arrow.svg';
+import { useStore } from '../stores/ama';
+import {
+  Answer as AnswerType,
+  Question as QuestionType,
+  Store,
+} from '../types';
 
 const List = styled('ul', {
   listStyle: 'none',
@@ -50,73 +56,85 @@ const Content = styled('div', {
   letterSpacing: '-0.025rem',
 });
 
-export default function Questions({ items, onAnswer, getAnswer }) {
-  console.log('items', items);
+const itemsSelector = (state: Store) => state.items;
+const fetchQuestionsSelector = (state: Store) => state.fetchQuestions;
+const sendAnswerSelector = (state: Store) => state.answer;
+const getAnswerSelector = (state: Store) => state.getAnswer;
+
+export default function Questions() {
+  const items = useStore(itemsSelector);
+  const fetchQuestions = useStore(fetchQuestionsSelector);
+
+  React.useEffect(() => {
+    fetchQuestions();
+  }, []);
+
+  if (!items) {
+    return;
+  }
+
   return (
     <List>
-      {items.reverse().map((item) => (
-        <Question
-          key={item.timestamp}
-          item={item}
-          onAnswer={onAnswer}
-          getAnswer={getAnswer}
-        />
-      ))}
+      {items
+        .sort((a, b) => b.timestampAsNumber - a.timestampAsNumber)
+        .map((item) => (
+          <Question key={item.timestampAsNumber} item={item} />
+        ))}
     </List>
   );
 }
 
-function Question({ item, onAnswer, getAnswer }) {
-  const [answer, setAnswer] = React.useState(null);
+function Question({ item }: { item: QuestionType }) {
   const [newAnswer, setNewAnswer] = React.useState('');
-  const { timestamp, question } = item;
-  const createdAt = timeago.format(timestamp.toNumber() * 1000);
-
-  const onRevealAnswer = async () => {
-    const answer = await getAnswer(item);
-    console.log('answer is', answer);
-    setAnswer(answer);
-  };
-
-  const onSubmit = (text) => {
-    onAnswer(item, text);
-  };
+  const sendAnswer = useStore(sendAnswerSelector);
+  const getAnswer = useStore(getAnswerSelector);
+  const { timestampAsNumber, text, loading } = item;
+  const { answer } = item;
+  const createdAt = timeago.format(timestampAsNumber);
 
   return (
     <Item>
       <Header>
-        <Title>{question}</Title>
+        <Title>{text}</Title>
         <Time>{createdAt}</Time>
       </Header>
-      {answer == null && (
-        <button type="button" onClick={onRevealAnswer}>
-          Reveal answer
-        </button>
-      )}
-
-      {answer?.answer === '' && (
+      {!loading && (
         <>
-          <input
-            type="text"
-            value={newAnswer}
-            onChange={(e) => setNewAnswer(e.target.value)}
-          />
-          <button type="button" onClick={() => onSubmit(newAnswer)}>
-            Answer
-          </button>
+          {answer == null && (
+            <button type="button" onClick={() => getAnswer(item)}>
+              Reveal answer
+            </button>
+          )}
+
+          {answer?.text === '' && (
+            <>
+              <input
+                type="text"
+                value={newAnswer}
+                onChange={(e) => setNewAnswer(e.target.value)}
+              />
+              <button type="button" onClick={() => sendAnswer(item, newAnswer)}>
+                Answer
+              </button>
+            </>
+          )}
+
+          {answer?.text.length > 0 && <Answer {...answer} />}
         </>
       )}
-
-      {answer?.length > 0 && <Answer>{answer.answer}</Answer>}
     </Item>
   );
 }
 
-function Answer({ children }) {
+function Answer({ text, loading, added }: AnswerType) {
   return (
     <Content>
       <Arrow />
-      <p>{children}</p>
+      <p>
+        {text}
+        {loading && <span>Loading...</span>}
+        {added && <span>Done!</span>}
+      </p>
     </Content>
   );
 }

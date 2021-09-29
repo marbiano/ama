@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { styled } from '../stitches.config';
+import { useStore } from '../stores/ama';
 
 const Field = styled('div', {
   position: 'relative',
@@ -50,8 +51,9 @@ const Button = styled('button', {
   },
 });
 
-export default function SubmitQuestion({ onSubmit }) {
+export default function SubmitQuestion() {
   const [question, setQuestion] = React.useState('');
+  const ask = useStore((state: any) => state.ask);
 
   return (
     <Field>
@@ -63,7 +65,7 @@ export default function SubmitQuestion({ onSubmit }) {
       <Button
         type="button"
         disabled={question.length === 0}
-        onClick={() => onSubmit(question)}
+        onClick={() => ask(question)}
       >
         Ask
       </Button>

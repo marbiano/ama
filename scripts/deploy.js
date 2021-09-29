@@ -10,9 +10,7 @@ async function main() {
   console.log('Account balance: ', balance.toString());
 
   const AMAFactory = await hre.ethers.getContractFactory('AMA');
-  const AMA = await AMAFactory.deploy({
-    value: hre.ethers.utils.parseEther('0.001'),
-  });
+  const AMA = await AMAFactory.deploy();
   await AMA.deployed();
 
   console.log('Contract deployed to:', AMA.address);

@@ -9,13 +9,13 @@ contract AMA {
 
   struct Question {
     address creator;
-    string question;
     uint256 timestamp;
+    string text;
   }
 
   struct Answer {
-    string answer;
     uint256 timestamp;
+    string text;
   }
 
   Question[] questions;
@@ -23,7 +23,8 @@ contract AMA {
   mapping(address => uint256) public lastQuestionTimestamp;
   mapping(address => mapping(uint256 => Answer)) public answers;
 
-  event NewQuestion(address indexed from, uint256 timestamp, string question);
+  event NewQuestion(address indexed creator, uint256 timestamp, string text);
+  event NewAnswer(address indexed questionFrom, uint256 questionTimestamp, string text);
 
   modifier onlyOwner() {
     require(msg.sender == owner, 'Not owner');
@@ -35,7 +36,7 @@ contract AMA {
     owner = msg.sender;
   }
 
-  function ask(string memory _question) public {
+  function ask(string memory _text) public {
     require(
       lastQuestionTimestamp[msg.sender] + 30 seconds <= block.timestamp,
       'You can ask only once per day'
@@ -45,13 +46,14 @@ contract AMA {
 
     console.log("%s has asked a question", msg.sender);
 
-    questions.push(Question(msg.sender, _question, block.timestamp));
-    emit NewQuestion(msg.sender, block.timestamp, _question);
+    questions.push(Question(msg.sender, block.timestamp, _text));
+    emit NewQuestion(msg.sender, block.timestamp, _text);
   }
 
-  function answer(address _questionCreator, uint _questionTime, string memory _answer) public onlyOwner {
-    answers[_questionCreator][_questionTime] = Answer(_answer, block.timestamp);
+  function answer(address _questionCreator, uint _questionTimestamp, string memory _text) public onlyOwner {
     console.log("%s question has been answered", _questionCreator);
+    answers[_questionCreator][_questionTimestamp] = Answer(block.timestamp, _text);
+    emit NewAnswer(_questionCreator, _questionTimestamp, _text);
   }
 
   function getQuestions() public view returns (Question[] memory) {
