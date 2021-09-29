@@ -1,6 +1,7 @@
 import { styled } from '../stitches.config';
 
 import EthereumSvg from '../assets/ethereum.svg';
+import { motion } from 'framer-motion';
 
 const Root = styled('div', {
   marginTop: '6rem',
@@ -33,11 +34,17 @@ const Button = styled('button', {
 
 export default function ConnectWallet({ onConnect, children }) {
   return (
-    <Root>
-      <Button type="button" onClick={onConnect}>
-        <EthereumIcon />
-        {children}
-      </Button>
-    </Root>
+    <motion.div
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.2, ease: 'easeInOut', delay: 0.2 }}
+    >
+      <Root>
+        <Button type="button" onClick={onConnect}>
+          <EthereumIcon />
+          {children}
+        </Button>
+      </Root>
+    </motion.div>
   );
 }

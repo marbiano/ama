@@ -39,20 +39,17 @@ export const useStore = create<Store>((set, get) => ({
     await contract.ask(text, { gasLimit: 300000 });
     set((state: any) => ({
       ...state,
+      loading: true,
       items: state.items.concat([
         { text, timestampAsNumber: Date.now(), loading: true },
       ]),
     }));
     contract.on('NewQuestion', async (creator, timestamp, text) => {
-      console.log('CREATOR IS', creator);
-      console.log('TIMESTAMP IS', timestamp);
-      console.log('TEXT IS', text);
       set((state) => ({
         ...state,
+        loading: false,
         items: state.items.map((item) => {
-          console.log('item creator is', creator);
-          console.log('loading is', item.loading);
-          return item.creator === creator && item.loading
+          return item.loading
             ? {
                 ...item,
                 creator,

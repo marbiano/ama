@@ -21,6 +21,7 @@
     "@stitches/react": "^1.2.1",
     "add": "^2.0.6",
     "dotenv": "^10.0.0",
+    "framer-motion": "^4.1.17",
     "next": "^11.1.2",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",

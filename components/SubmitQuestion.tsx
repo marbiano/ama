@@ -1,8 +1,9 @@
+import { motion } from 'framer-motion';
 import * as React from 'react';
 import { styled } from '../stitches.config';
 import { useStore } from '../stores/ama';
 
-const Field = styled('div', {
+const Form = styled('form', {
   position: 'relative',
   width: '100%',
   maxWidth: 600,
@@ -10,11 +11,11 @@ const Field = styled('div', {
 });
 
 const Text = styled('textarea', {
-  background: 'transparent',
+  background: '$black50',
   display: 'block',
   width: '100%',
   height: '7em',
-  border: '1px solid $white40',
+  border: '1px solid $white20',
   borderRadius: 3,
   color: '$white',
   fontFamily: '$sans',
@@ -25,7 +26,7 @@ const Text = styled('textarea', {
 
   '&:focus': {
     outline: 'none',
-    borderColor: '$white70',
+    borderColor: '$white50',
   },
 });
 
@@ -53,22 +54,37 @@ const Button = styled('button', {
 
 export default function SubmitQuestion() {
   const [question, setQuestion] = React.useState('');
-  const ask = useStore((state: any) => state.ask);
+  const ask = useStore((state) => state.ask);
+  const loading = useStore((state) => state.loading);
+
+  React.useEffect(() => {
+    if (loading) {
+      setQuestion('');
+    }
+  });
+
+  const onSubmit = (e) => {
+    e.preventDefault();
+    ask(question);
+  };
 
   return (
-    <Field>
-      <Text
-        placeholder="Type your question here..."
-        value={question}
-        onChange={(e) => setQuestion(e.target.value)}
-      />
-      <Button
-        type="button"
-        disabled={question.length === 0}
-        onClick={() => ask(question)}
-      >
-        Ask
-      </Button>
-    </Field>
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.3, ease: 'easeOut', delay: 1.2 }}
+    >
+      <Form onSubmit={onSubmit}>
+        <Text
+          placeholder="Have a question for me?"
+          value={question}
+          onChange={(e) => setQuestion(e.target.value)}
+          maxLength={240}
+        />
+        <Button type="submit" disabled={question.length === 0}>
+          Ask
+        </Button>
+      </Form>
+    </motion.div>
   );
 }

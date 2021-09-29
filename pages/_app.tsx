@@ -1,4 +1,6 @@
 // @ts-check
+import Layout from '../components/Layout';
+import { AddressProvider } from '../hooks/use-address';
 import { globalCss } from '../stitches.config';
 
 const globalStyles = globalCss({
@@ -47,5 +49,11 @@ const globalStyles = globalCss({
 
 export default function MyApp({ Component, pageProps }) {
   globalStyles();
-  return <Component {...pageProps} />;
+  return (
+    <AddressProvider>
+      <Layout>
+        <Component {...pageProps} />
+      </Layout>
+    </AddressProvider>
+  );
 }

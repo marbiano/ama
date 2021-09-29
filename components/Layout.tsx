@@ -1,11 +1,15 @@
+import useAddress, { AddressProvider } from '../hooks/use-address';
 import { styled } from '../stitches.config';
 
 const Root = styled('div', {
   position: 'relative',
   width: '100vw',
   paddingBottom: '10rem',
-  // height: '100vh',
-  // overflow: 'hidden',
+
+  '&.is-locked': {
+    height: '100vh',
+    overflow: 'hidden',
+  },
 
   '&:after': {
     content: '',
@@ -24,12 +28,13 @@ const Root = styled('div', {
 const Container = styled('div', {
   maxWidth: 600,
   marginLeft: 300,
-  marginTop: 100,
+  marginTop: 140,
 });
 
 export default function Layout({ children }) {
+  const { address, isLoading } = useAddress();
   return (
-    <Root>
+    <Root className={!address && !isLoading ? 'is-locked' : ''}>
       <Container>{children}</Container>
     </Root>
   );
