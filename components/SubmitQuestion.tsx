@@ -61,7 +61,7 @@ export default function SubmitQuestion() {
     if (loading) {
       setQuestion('');
     }
-  });
+  }, [setQuestion, loading]);
 
   const onSubmit = (e) => {
     e.preventDefault();

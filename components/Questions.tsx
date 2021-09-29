@@ -119,7 +119,7 @@ export default function Questions() {
 
   React.useEffect(() => {
     fetchQuestions();
-  }, []);
+  }, [fetchQuestions]);
 
   if (!items) {
     return;
