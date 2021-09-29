@@ -30,9 +30,23 @@ const Button = styled('button', {
     background: '$lightOrange',
     color: '$white',
   },
+
+  '&:disabled': {
+    background: '$orange75',
+    color: '$white50',
+    cursor: 'not-allowed',
+
+    [`& ${EthereumIcon}`]: {
+      color: '$white50',
+    },
+  },
 });
 
-export default function ConnectWallet({ onConnect, children }) {
+const Warning = styled('p', {
+  margin: '2rem 0 0',
+});
+
+export default function ConnectWallet({ onConnect, canConnect, children }) {
   return (
     <motion.div
       initial={{ opacity: 0, y: 10 }}
@@ -40,10 +54,17 @@ export default function ConnectWallet({ onConnect, children }) {
       transition={{ duration: 0.2, ease: 'easeInOut', delay: 0.2 }}
     >
       <Root>
-        <Button type="button" onClick={onConnect}>
+        <Button type="button" onClick={onConnect} disabled={!canConnect}>
           <EthereumIcon />
           {children}
         </Button>
+        {!canConnect && (
+          <Warning>
+            You need to have{' '}
+            <a href="https://metamask.io">an Ethereum wallet</a> in order to use
+            this app.
+          </Warning>
+        )}
       </Root>
     </motion.div>
   );

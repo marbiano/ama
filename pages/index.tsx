@@ -7,7 +7,7 @@ import SubmitQuestion from '../components/SubmitQuestion';
 import useAddress from '../hooks/use-address';
 
 export default function Index() {
-  const { address, isLoading, connect } = useAddress();
+  const { address, connect, isLoading, canConnect } = useAddress();
 
   return (
     <>
@@ -20,7 +20,7 @@ export default function Index() {
       )}
       {!address && !isLoading && (
         <>
-          <ConnectWallet onConnect={connect}>
+          <ConnectWallet onConnect={connect} canConnect={canConnect}>
             Connect to participate
           </ConnectWallet>
           <Skeleton />

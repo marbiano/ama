@@ -29,6 +29,7 @@ export const {
       orange: 'hsl(18 83% 47%)',
       orange05: 'hsl(18 83% 47% / 0.05)',
       orange15: 'hsl(18 83% 47% / 0.15)',
+      orange50: 'hsl(18 83% 47% / 0.50)',
       orange75: 'hsl(18 83% 47% / 0.75)',
       lightOrange: 'hsl(27 99% 44%)',
       green: 'hsl(122 33% 58%)',

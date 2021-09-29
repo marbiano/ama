@@ -7,8 +7,9 @@ const METAMASK_ACTIONS = {
 
 type AddressContextType = {
   address: string;
-  isLoading: boolean;
   connect: () => void;
+  isLoading: boolean;
+  canConnect: boolean;
 };
 
 const AddressContext = React.createContext<AddressContextType | null>(null);
@@ -25,12 +26,14 @@ export default function useAddress() {
 export function AddressProvider({ children }) {
   const [address, setAddress] = React.useState<string | null>();
   const [isLoading, setIsLoading] = React.useState(true);
+  const [canConnect, setCanConnect] = React.useState(true);
 
   React.useEffect(() => {
     const { ethereum } = window;
     if (!ethereum) {
       console.log('No access to the Ethereum object');
       setIsLoading(false);
+      setCanConnect(false);
       return;
     }
 
@@ -71,7 +74,7 @@ export function AddressProvider({ children }) {
     }
   }
 
-  const value: AddressContextType = { address, isLoading, connect };
+  const value: AddressContextType = { address, connect, isLoading, canConnect };
 
   return (
     <AddressContext.Provider value={value}>{children}</AddressContext.Provider>
